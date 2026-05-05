@@ -27,8 +27,12 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[session POST] Failed to create session cookie:", message, err);
+    // Return the actual error in dev for easier debugging; generic in prod.
+    const detail = process.env.NODE_ENV === "production" ? "Unauthorized" : message;
+    return NextResponse.json({ error: detail }, { status: 401 });
   }
 }
 
