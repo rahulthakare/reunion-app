@@ -1,17 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface AdminNavProps {
   userEmail: string;
 }
 
+const NAV_LINKS = [
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/agenda", label: "Agenda" },
+  { href: "/admin/attendees", label: "Attendees" },
+  { href: "/admin/directory", label: "Directory" },
+  { href: "/admin/pending-approvals", label: "Approvals", showBadge: true },
+];
+
 export function AdminNav({ userEmail }: AdminNavProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [loggingOut, setLoggingOut] = useState(false);
   const [pendingCount, setPendingCount] = useState<number | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   // Fetch pending approvals count once on mount and refresh every 60s
   useEffect(() => {
@@ -25,7 +40,7 @@ export function AdminNav({ userEmail }: AdminNavProps) {
           setPendingCount(body.count);
         }
       } catch {
-        // ignore — badge will just not show
+        // ignore
       }
     }
     load();
@@ -39,9 +54,7 @@ export function AdminNav({ userEmail }: AdminNavProps) {
   async function handleLogout() {
     setLoggingOut(true);
     try {
-      // Clear the session cookie server-side
       await fetch("/api/auth/session", { method: "DELETE" });
-      // Sign out from Firebase client-side
       const { auth } = await import("@/lib/firebase/client");
       const { signOut } = await import("firebase/auth");
       await signOut(auth);
@@ -52,59 +65,41 @@ export function AdminNav({ userEmail }: AdminNavProps) {
     }
   }
 
+  function renderBadge() {
+    if (pendingCount === null || pendingCount === 0) return null;
+    return (
+      <span className="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-semibold">
+        {pendingCount > 99 ? "99+" : pendingCount}
+      </span>
+    );
+  }
+
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo + nav links */}
-          <div className="flex items-center gap-8">
-            <Link href="/admin" className="text-lg font-bold text-indigo-600">
-              Reunion <span className="text-gray-900">Admin</span>
-            </Link>
-            <div className="hidden md:flex items-center gap-6">
+          {/* Logo */}
+          <Link href="/admin" className="text-lg font-bold text-indigo-600">
+            Reunion <span className="text-gray-900">Admin</span>
+          </Link>
+
+          {/* Desktop nav links */}
+          <div className="hidden md:flex items-center gap-6">
+            {NAV_LINKS.map((link) => (
               <Link
-                href="/admin"
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                key={link.href}
+                href={link.href}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center"
               >
-                Dashboard
+                {link.label}
+                {link.showBadge && renderBadge()}
               </Link>
-              <Link
-                href="/admin/agenda"
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Agenda
-              </Link>
-              <Link
-                href="/admin/attendees"
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Attendees
-              </Link>
-              <Link
-                href="/admin/directory"
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Directory
-              </Link>
-              <Link
-                href="/admin/pending-approvals"
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1.5"
-              >
-                Approvals
-                {pendingCount !== null && pendingCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-semibold">
-                    {pendingCount > 99 ? "99+" : pendingCount}
-                  </span>
-                )}
-              </Link>
-            </div>
+            ))}
           </div>
 
-          {/* User info + logout */}
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500 hidden sm:block">
-              {userEmail}
-            </span>
+          {/* Desktop user info + logout */}
+          <div className="hidden md:flex items-center gap-4">
+            <span className="text-sm text-gray-500 hidden lg:block">{userEmail}</span>
             <button
               onClick={handleLogout}
               disabled={loggingOut}
@@ -113,7 +108,60 @@ export function AdminNav({ userEmail }: AdminNavProps) {
               {loggingOut ? "Signing out…" : "Sign Out"}
             </button>
           </div>
+
+          {/* Mobile hamburger button */}
+          <button
+            type="button"
+            className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors relative"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+            {/* Show a small dot if there are pending approvals (so admin notices even with menu closed) */}
+            {!mobileOpen && pendingCount !== null && pendingCount > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            )}
+          </button>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-gray-200 py-3">
+            <div className="flex flex-col gap-1">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                >
+                  <span>{link.label}</span>
+                  {link.showBadge && renderBadge()}
+                </Link>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <div className="px-3 text-xs text-gray-500 truncate mb-2">
+                Signed in as {userEmail}
+              </div>
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="w-full btn-secondary text-sm"
+              >
+                {loggingOut ? "Signing out…" : "Sign Out"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

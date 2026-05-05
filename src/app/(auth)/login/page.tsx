@@ -2,7 +2,7 @@
 
 import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -27,9 +27,14 @@ function LoginFallback() {
 
 function LoginContent() {
   const { signInWithEmail, signUpWithEmail, signInWithGoogle, resetPassword } = useAuth();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") ?? "/directory";
+
+  // Hard navigation ensures the server-side rendered next page sees the new session cookie.
+  // router.push() does a soft client navigation — server components would still have stale auth state.
+  function navigateAfterLogin() {
+    window.location.assign(redirect);
+  }
 
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
@@ -88,7 +93,7 @@ function LoginContent() {
       if (result.status === "pending") {
         setPending(result.message);
       } else {
-        router.push(redirect);
+        navigateAfterLogin();
       }
     } catch (err) {
       console.error("[Login] Sign-in failed:", err);
@@ -121,7 +126,7 @@ function LoginContent() {
       if (result.status === "pending") {
         setPending(result.message);
       } else {
-        router.push(redirect);
+        navigateAfterLogin();
       }
     } catch (err) {
       console.error("[Login] Sign-up failed:", err);
@@ -141,7 +146,7 @@ function LoginContent() {
       if (result.status === "pending") {
         setPending(result.message);
       } else {
-        router.push(redirect);
+        navigateAfterLogin();
       }
     } catch (err) {
       console.error("[Login] Google sign-in failed:", err);

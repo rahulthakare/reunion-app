@@ -59,9 +59,98 @@ Next.js (frontend) and Firebase (backend).
 
 ---
 
-## 2. Layer Breakdown
+## 2. Mobile-First Design Principles ⭐
 
-### 2.1 Frontend — Next.js App Router
+> **The Reunion App is a mobile-first application.** Most batchmates will visit on their
+> phones (WhatsApp/text-message links, on the go). Desktop is a secondary, "nice-to-have"
+> experience. Every UI/UX decision must prioritize mobile.
+
+### 2.1 Hard rules — apply to every component, page, and feature
+
+1. **Design for the smallest screen first** (target: 360px wide — typical Android phone).
+   Build the mobile layout, then enhance for tablet and desktop using `sm:`, `md:`, `lg:` Tailwind breakpoints.
+2. **Touch targets ≥ 44 × 44 px** for any tappable element (buttons, links, icons). This is
+   the WCAG and Apple HIG recommendation.
+3. **No `hidden md:flex` patterns that hide critical navigation on mobile.** Always provide
+   a hamburger menu / bottom sheet / collapsible alternative.
+4. **Responsive typography**: base `text-sm` to `text-base` on mobile, scale up to `text-lg`
+   only on `md:` and above. Avoid fixed pixel font sizes.
+5. **One-thumb reachable**: place primary actions in the bottom 2/3 of the screen where
+   thumbs naturally rest. Avoid top-right primary CTAs.
+6. **Forms must work with mobile keyboards**:
+   - Use semantic input types (`type="email"`, `type="tel"`, `type="number"`, `inputMode="numeric"`)
+   - Set `autoComplete` attributes correctly so password managers work
+   - Use `placeholder` text that survives autofill
+7. **Tables → Cards on mobile.** Wide tables are a UX disaster on mobile. Use a card
+   layout for `< md` and a table for `md:` and above when displaying lists.
+8. **Modals & overlays**: full-screen on mobile, dialog on desktop. Use `inset-0` on mobile,
+   centered card on `md:`.
+9. **Avoid horizontal scrolling** (except inside intentional carousels). If content overflows,
+   wrap or collapse.
+10. **Test on a real device or device emulator** — not just by resizing the browser.
+
+### 2.2 Tailwind breakpoint strategy
+
+| Breakpoint | Width | Devices | Approach |
+|------------|-------|---------|----------|
+| **default** | < 640px | Phones (portrait) | Primary target — design here first |
+| **sm:** | ≥ 640px | Large phones / small tablets | Minor refinements |
+| **md:** | ≥ 768px | Tablets, small laptops | Switch to multi-column layouts, show full nav |
+| **lg:** | ≥ 1024px | Desktops | Add side panels, max widths |
+| **xl:** | ≥ 1280px | Large desktops | Generous whitespace |
+
+**Mobile-first Tailwind pattern** (always start unprefixed, then add larger breakpoint overrides):
+```tsx
+// ✅ Good — mobile-first
+<div className="flex flex-col gap-3 md:flex-row md:gap-6">
+
+// ❌ Avoid — desktop-first
+<div className="flex flex-row gap-6 sm:flex-col sm:gap-3">
+```
+
+### 2.3 Performance budget for mobile
+
+- **Initial JS bundle:** target < 200 KB gzipped
+- **Largest Contentful Paint (LCP):** < 2.5s on 4G mobile
+- **First Input Delay (FID):** < 100ms
+- **Cumulative Layout Shift (CLS):** < 0.1
+- **Use Server Components** by default — they ship zero JS to the client
+- **Lazy-load images** with Next.js `<Image>` and proper `sizes` prop
+- **Avoid client-side fetches in waterfalls** — prefer Server Components calling Firestore directly
+
+### 2.4 Mobile-specific accessibility
+
+- All forms must work without hover (no hover-only tooltips or actions)
+- Sufficient color contrast (WCAG AA: 4.5:1 for body text, 3:1 for large text)
+- Focus rings visible on all interactive elements
+- Avoid relying on color alone to convey meaning
+- `<meta name="viewport" content="width=device-width, initial-scale=1">` (Next.js handles by default)
+
+### 2.5 Components to avoid on mobile
+
+- **Hover-triggered menus** — use tap/click instead
+- **Sticky headers > 80px tall** — eats too much screen real estate
+- **Multi-column form layouts** — stack vertically on mobile
+- **Right-click context menus** — never available on mobile
+- **Drag-and-drop** as the only interaction — provide an alternative (button)
+
+### 2.6 Recommended UI patterns
+
+| Use case | Mobile pattern | Desktop pattern |
+|----------|---------------|-----------------|
+| Primary nav | Hamburger menu + slide-down panel | Horizontal nav bar |
+| Long lists | Card grid (1 column) with infinite scroll/pagination | Table with sortable columns |
+| Forms | Single-column, full-width inputs | Multi-column where appropriate |
+| Modals | Full-screen sheet, slide up from bottom | Centered dialog |
+| Action buttons | Floating Action Button (FAB) bottom-right | Top-right or inline |
+| Confirmation | Bottom sheet with confirm/cancel | Modal or inline confirmation |
+| Image galleries | Swipeable carousel + tap to expand | Grid with hover effect |
+
+---
+
+## 3. Layer Breakdown
+
+### 3.1 Frontend — Next.js App Router
 
 | Concept             | Description                                                                 |
 |---------------------|-----------------------------------------------------------------------------|
@@ -71,7 +160,7 @@ Next.js (frontend) and Firebase (backend).
 | **Layouts**         | Shared UI (nav, sidebar, footer) defined in `layout.tsx` at each route level. |
 | **Loading / Error** | `loading.tsx` and `error.tsx` provide per-route loading and error states.  |
 
-### 2.2 API Layer — Next.js API Routes
+### 3.2 API Layer — Next.js API Routes
 
 - Located at `src/app/api/`.
 - Run on the **Node.js server** (or Edge runtime where appropriate).
@@ -79,7 +168,7 @@ Next.js (frontend) and Firebase (backend).
   secret-dependent logic, webhook receivers.
 - Client components call these routes via `fetch()`.
 
-### 2.3 Backend — Firebase
+### 3.3 Backend — Firebase
 
 | Service            | Purpose                                                                 |
 |--------------------|-------------------------------------------------------------------------|
@@ -91,7 +180,7 @@ Next.js (frontend) and Firebase (backend).
 
 ---
 
-## 3. Data Flow
+## 4. Data Flow
 
 ### Authentication Flow
 ```
@@ -130,7 +219,7 @@ Client Component
 
 ---
 
-## 4. Directory Structure
+## 5. Directory Structure
 
 ```
 src/
@@ -182,21 +271,25 @@ src/
 
 ---
 
-## 5. Key Architectural Decisions
+## 6. Key Architectural Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
+| **Design Approach** ⭐ | **Mobile-first** | Most batchmates use phones; mobile UX is primary, desktop is bonus |
 | **Router** | App Router (not Pages Router) | Server Components, better layouts, streaming |
 | **Backend** | Firebase | Auth + DB + Storage in one; real-time capability; no server to manage |
 | **Database** | Firestore | Schema-flexible for evolving event/RSVP data; real-time subscriptions |
 | **Auth** | Firebase Auth | Built-in providers (Google, email); integrates with Firestore rules |
-| **Rendering** | Server Components by default | Better performance, SEO, smaller JS bundle |
+| **Auth model** | Whitelist by email in `contacts` | Privacy: only known batchmates can access directory; admin pre-approves rest |
+| **Rendering** | Server Components by default | Better performance, SEO, smaller JS bundle on mobile |
 | **API Routes** | Next.js API routes | Keeps server-only secrets (Firebase Admin) off the client |
 | **TypeScript** | Strict mode | Catches errors early; required for maintainability |
+| **Styling** | Tailwind CSS | Mobile-first by default; utility classes match responsive design |
+| **Hosting** | Vercel | Native Next.js support; auto-deploy from GitHub |
 
 ---
 
-## 6. Security Model
+## 7. Security Model
 
 - **Firebase Security Rules** are the primary data access guard — never rely solely on client-side checks.
 - **Firebase Admin SDK** is used server-side only (in API routes) for privileged operations.
@@ -206,7 +299,7 @@ src/
 
 ---
 
-## 7. Scalability Considerations
+## 8. Scalability Considerations
 
 - Firestore scales horizontally; no tuning needed for moderate traffic.
 - Next.js can be deployed to Vercel (serverless) or a Node.js host with minimal config.
@@ -215,7 +308,7 @@ src/
 
 ---
 
-## 8. Backend Alternative Considered
+## 9. Backend Alternative Considered
 
 | Option | Pros | Cons | Why Not Chosen |
 |--------|------|------|----------------|

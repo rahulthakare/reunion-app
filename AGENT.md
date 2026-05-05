@@ -14,6 +14,26 @@ The admin section (protected by Firebase Auth) allows reunion organizers to mana
 
 ---
 
+## ⭐ Mobile-First — Most Important Rule
+
+**This app is mobile-first.** Most batchmates will visit on their phones. Every UI/UX
+decision must prioritize mobile, then enhance for desktop.
+
+### Quick rules to follow always:
+- 📱 **Design for 360px wide first**, then add `sm:` `md:` `lg:` for larger screens
+- 👆 **Touch targets ≥ 44 × 44 px** for all tappable elements
+- 🍔 **Provide a hamburger menu** if nav links don't fit on mobile (never `hidden md:flex` without an alternative)
+- 📊 **Tables → Cards on mobile**: use card grid for `< md`, table for `md:` and above
+- 🪟 **Modals: full-screen on mobile**, centered dialog on desktop
+- ✋ **No hover-only interactions** — must work with tap
+- 📝 **Forms: single column on mobile**, multi-column only on `md:` and above
+- 🎨 **Use Tailwind mobile-first**: `flex-col md:flex-row` (not `flex-row sm:flex-col`)
+
+> See **`ARCHITECTURE.md` Section 2** for the full mobile-first design principles,
+> Tailwind breakpoint strategy, performance budget, and recommended UI patterns.
+
+---
+
 ## Tech Stack
 
 | Layer        | Technology                          |
@@ -114,6 +134,15 @@ npm run type-check   # Run TypeScript type checking
 ---
 
 ## Do Not
+
+- ❌ Use `hidden md:flex` to hide critical navigation on mobile without providing a hamburger fallback
+- ❌ Use desktop-first Tailwind patterns like `flex-row sm:flex-col`
+- ❌ Build features tested only at desktop width — always check at 360px first
+- ❌ Use hover-only tooltips, menus, or actions (mobile has no hover)
+- ❌ Make tap targets smaller than 44px
+- ❌ Use multi-column form layouts that don't collapse on mobile
+
+## Do Not (continued)
 
 - Do not use the Pages Router (`pages/` directory).
 - Do not use `any` type in TypeScript.

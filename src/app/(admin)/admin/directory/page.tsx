@@ -56,14 +56,14 @@ export default function AdminDirectoryPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Batchmate Address Book</h1>
           <p className="text-gray-500 mt-1 text-sm">
             Manage the contact directory for NEHS Wardha — Batch &apos;93.
           </p>
         </div>
-        <Link href="/admin/directory/new" className="btn-primary">
+        <Link href="/admin/directory/new" className="btn-primary text-center whitespace-nowrap">
           + Add Contact
         </Link>
       </div>
@@ -96,63 +96,113 @@ export default function AdminDirectoryPage() {
             : "No contacts match your search."}
         </div>
       ) : (
-        <div className="card overflow-hidden p-0">
-          <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs text-gray-500">
+        <>
+          <div className="text-xs text-gray-500 mb-3">
             {filtered.length} contact{filtered.length !== 1 ? "s" : ""}
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">#</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">First Name</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Last Name</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">City</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Profession</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Phone</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Visible</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {filtered.map((contact, idx) => (
-                  <tr key={contact.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-gray-400">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{contact.firstName || "—"}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{contact.lastName || "—"}</td>
-                    <td className="px-4 py-3 text-gray-500">{contact.city}</td>
-                    <td className="px-4 py-3 text-gray-500">{contact.profession || "—"}</td>
-                    <td className="px-4 py-3 text-gray-500">{contact.phone || "—"}</td>
-                    <td className="px-4 py-3">
-                      {contact.showContact ? (
-                        <span className="text-green-600 text-xs font-medium">✓ Yes</span>
-                      ) : (
-                        <span className="text-gray-400 text-xs">Hidden</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href={`/admin/directory/${contact.id}/edit`}
-                          className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(contact.id, getDisplayName(contact))}
-                          disabled={deleting === contact.id}
-                          className="text-red-500 hover:text-red-700 text-xs font-medium disabled:opacity-50"
-                        >
-                          {deleting === contact.id ? "…" : "Delete"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* ── Mobile: card layout (< md) ───────────────────────────── */}
+          <div className="md:hidden space-y-3">
+            {filtered.map((contact) => (
+              <div key={contact.id} className="card p-4">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <div className="font-semibold text-gray-900">
+                      {contact.firstName} {contact.lastName}
+                    </div>
+                    {contact.city && (
+                      <div className="text-sm text-gray-500 mt-0.5">📍 {contact.city}</div>
+                    )}
+                  </div>
+                  {contact.showContact ? (
+                    <span className="text-green-600 text-xs font-medium whitespace-nowrap">✓ Visible</span>
+                  ) : (
+                    <span className="text-gray-400 text-xs whitespace-nowrap">Hidden</span>
+                  )}
+                </div>
+                <div className="text-sm text-gray-600 space-y-1 mb-3">
+                  {contact.profession && <div>💼 {contact.profession}</div>}
+                  {contact.phone && (
+                    <a href={`tel:${contact.phone}`} className="text-indigo-600 block">
+                      📞 {contact.phone}
+                    </a>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                  <Link
+                    href={`/admin/directory/${contact.id}/edit`}
+                    className="flex-1 text-center bg-indigo-50 text-indigo-700 px-3 py-2 rounded-lg text-sm font-medium"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(contact.id, getDisplayName(contact))}
+                    disabled={deleting === contact.id}
+                    className="flex-1 text-center bg-red-50 text-red-700 px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                  >
+                    {deleting === contact.id ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* ── Desktop: table layout (md+) ──────────────────────────── */}
+          <div className="hidden md:block card overflow-hidden p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">#</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">First Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Last Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">City</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Profession</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Phone</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Visible</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {filtered.map((contact, idx) => (
+                    <tr key={contact.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-gray-400">{idx + 1}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{contact.firstName || "—"}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{contact.lastName || "—"}</td>
+                      <td className="px-4 py-3 text-gray-500">{contact.city}</td>
+                      <td className="px-4 py-3 text-gray-500">{contact.profession || "—"}</td>
+                      <td className="px-4 py-3 text-gray-500">{contact.phone || "—"}</td>
+                      <td className="px-4 py-3">
+                        {contact.showContact ? (
+                          <span className="text-green-600 text-xs font-medium">✓ Yes</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">Hidden</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <Link
+                            href={`/admin/directory/${contact.id}/edit`}
+                            className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                          >
+                            Edit
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(contact.id, getDisplayName(contact))}
+                            disabled={deleting === contact.id}
+                            className="text-red-500 hover:text-red-700 text-xs font-medium disabled:opacity-50"
+                          >
+                            {deleting === contact.id ? "…" : "Delete"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
