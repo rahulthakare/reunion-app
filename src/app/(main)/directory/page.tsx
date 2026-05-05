@@ -1,26 +1,35 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { adminAuth } from "@/lib/firebase/admin";
+import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { ContactGrid } from "@/components/ui/ContactGrid";
-import type { ContactListItem } from "@/types/contact";
+import { deriveContactFields } from "@/lib/utils/contact";
+import type { Contact, ContactListItem } from "@/types/contact";
 
 export const dynamic = "force-dynamic";
 
+// Call Firestore directly — no HTTP round-trip to our own /api route.
+// This avoids the "NEXT_PUBLIC_BASE_URL" problem on Vercel and is much faster.
 async function getContacts(): Promise<ContactListItem[]> {
   try {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/contacts`,
-      {
-        headers: { Cookie: `session=${session}` },
-        next: { revalidate: 60 },
+    const snapshot = await adminDb.collection("contacts").get();
+    const contacts: ContactListItem[] = snapshot.docs.map((doc) => {
+      const raw = { id: doc.id, ...(doc.data() as Partial<Contact>) };
+      const enriched = deriveContactFields(raw);
+      // Strip sensitive fields if user opted out
+      if (enriched.showContact === false) {
+        return { ...enriched, phone: undefined, email: undefined };
       }
-    );
-    if (!res.ok) return [];
-    const data = (await res.json()) as { contacts: ContactListItem[] };
-    return data.contacts;
-  } catch {
+      return enriched;
+    });
+    // Sort by lastName then firstName
+    contacts.sort((a, b) => {
+      const byLast = (a.lastName ?? "").localeCompare(b.lastName ?? "");
+      if (byLast !== 0) return byLast;
+      return (a.firstName ?? "").localeCompare(b.firstName ?? "");
+    });
+    return contacts;
+  } catch (err) {
+    console.error("[directory] Failed to fetch contacts from Firestore:", err);
     return [];
   }
 }
