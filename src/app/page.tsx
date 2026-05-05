@@ -2,17 +2,24 @@ import Link from "next/link";
 import { Countdown } from "@/components/ui/Countdown";
 import { RSVPForm } from "@/components/ui/RSVPForm";
 import { AgendaSection } from "@/components/ui/AgendaSection";
-import type { Agenda } from "@/types/agenda";
+import { adminDb } from "@/lib/firebase/admin";
+import type { Agenda, AgendaItem } from "@/types/agenda";
 
+// Force dynamic so we read the latest agenda from Firestore on each request.
+export const dynamic = "force-dynamic";
+
+// Call Firestore directly via Admin SDK — no HTTP self-call needed.
 async function getAgenda(): Promise<Agenda> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/agenda`,
-      { next: { revalidate: 60 } } // revalidate every 60 seconds
+    const doc = await adminDb.doc("config/agenda").get();
+    if (!doc.exists) return { items: [] };
+    const data = doc.data() as Agenda | undefined;
+    const items = (data?.items ?? []).slice().sort(
+      (a: AgendaItem, b: AgendaItem) => (a.order ?? 0) - (b.order ?? 0)
     );
-    if (!res.ok) return { items: [] };
-    return res.json() as Promise<Agenda>;
-  } catch {
+    return { items, updatedAt: data?.updatedAt };
+  } catch (err) {
+    console.error("[home] Failed to fetch agenda from Firestore:", err);
     return { items: [] };
   }
 }
