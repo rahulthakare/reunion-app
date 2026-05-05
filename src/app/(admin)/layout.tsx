@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
 import { AdminNav } from "@/components/features/AdminNav";
 
+export const dynamic = "force-dynamic";
+
 async function getAdminUser() {
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value;

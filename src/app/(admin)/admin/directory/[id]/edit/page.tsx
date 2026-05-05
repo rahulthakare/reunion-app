@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase/admin";
+
+// Don't try to pre-render at build time — this page hits Firestore at request time
+export const dynamic = "force-dynamic";
 import { ContactForm } from "@/components/features/ContactForm";
 import { deriveContactFields, getDisplayName } from "@/lib/utils/contact";
 import type { Contact } from "@/types/contact";

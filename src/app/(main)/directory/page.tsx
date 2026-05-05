@@ -4,6 +4,8 @@ import { adminAuth } from "@/lib/firebase/admin";
 import { ContactGrid } from "@/components/ui/ContactGrid";
 import type { ContactListItem } from "@/types/contact";
 
+export const dynamic = "force-dynamic";
+
 async function getContacts(): Promise<ContactListItem[]> {
   try {
     const cookieStore = await cookies();
