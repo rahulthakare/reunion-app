@@ -1,0 +1,6 @@
+firstName,lastName,email,phone,city,currentAddress,permanentAddress,profession,company,socialLink,showContact
+Anil,Deshpande,anil.deshpande.test@example.com,+919823456701,Pune,"Flat 401, Symphony Towers, Aundh, Pune 411007","Bajaj Nagar, Wardha 442001",Mechanical Engineer,Bajaj Auto,https://www.linkedin.com/in/anildeshpande,true
+Smita,Joshi,smita.joshi.test@example.com,+919823456702,Nagpur,"Plot 22, Shivaji Nagar, Nagpur 440010","Civil Lines, Wardha 442001",Pediatrician,Care Hospital,,true
+Prashant,Kale,prashant.kale.test@example.com,+919823456703,Mumbai,"B-12, Sea Breeze, Bandra West, Mumbai 400050","Sevagram Road, Wardha 442102",Chartered Accountant,Deloitte India,https://www.linkedin.com/in/prashantkale,true
+Rohini,Bhagwat,rohini.bhagwat.test@example.com,+919823456704,Bangalore,"#508, Brigade Gateway, Rajajinagar, Bangalore 560055","Arvi Road, Wardha 442001",Software Architect,Microsoft India,,false
+Sandeep,Patil,sandeep.patil.test@example.com,+919823456705,Wardha,"Near Mahatma Gandhi Hospital, Wardha 442001","Same as current",Lawyer,Independent Practice,,true

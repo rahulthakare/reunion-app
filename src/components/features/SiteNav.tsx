@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
@@ -14,6 +15,10 @@ const NAV_LINKS = [
 export function SiteNav() {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
+
+  // Avoid hydration mismatch — only render auth-dependent UI client-side
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   async function handleLogout() {
     try {
@@ -49,24 +54,26 @@ export function SiteNav() {
                 }`}
               >
                 {link.label}
-                {link.authRequired && !user && !loading && (
+                {mounted && link.authRequired && !user && !loading && (
                   <span className="ml-1 text-xs text-gray-400">🔒</span>
                 )}
               </Link>
             );
           })}
 
-          {/* Auth state indicator */}
-          {loading ? (
-            <span className="text-xs text-gray-300">…</span>
+          {/* Auth state indicator — render placeholder on server, real UI after mount */}
+          {!mounted || loading ? (
+            <span className="text-xs text-gray-300 w-16 inline-block">&nbsp;</span>
           ) : user ? (
             <div className="flex items-center gap-3">
-              <Link
-                href="/admin"
-                className="text-xs text-gray-500 hover:text-indigo-600 hidden sm:inline"
-              >
-                Admin
-              </Link>
+              {user.isAdmin && (
+                <Link
+                  href="/admin"
+                  className="text-xs text-gray-500 hover:text-indigo-600 hidden sm:inline"
+                >
+                  Admin
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"

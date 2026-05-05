@@ -62,11 +62,17 @@ export default async function Home() {
             >
               RSVP Now
             </a>
-            <a
-              href="#details"
+            <Link
+              href="/directory"
               className="border border-white text-white font-semibold px-8 py-3 rounded-lg hover:bg-indigo-600 transition-colors"
             >
-              Event Details
+              📒 Address Book
+            </Link>
+            <a
+              href="#details"
+              className="text-indigo-200 hover:text-white text-sm underline transition-colors"
+            >
+              View event details ↓
             </a>
           </div>
         </div>
@@ -144,8 +150,31 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── Address Book CTA ────────────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="card text-center bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
+            <div className="text-5xl mb-4">📒</div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Reconnect with Batchmates
+            </h2>
+            <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+              Browse the full address book of NEHS Wardha — Batch &apos;93. See who&apos;s where,
+              what they&apos;re doing, and how to reach out.
+            </p>
+            <Link
+              href="/directory"
+              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+            >
+              Open Address Book →
+            </Link>
+            <p className="text-xs text-gray-400 mt-3">Sign-in required for privacy</p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Gallery teaser ──────────────────────────────────── */}
-      <section className="py-16">
+      <section className="py-16 bg-indigo-50">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Share Your Memories</h2>
           <p className="text-gray-500 mb-8">

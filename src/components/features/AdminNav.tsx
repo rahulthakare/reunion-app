@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface AdminNavProps {
   userEmail: string;
@@ -11,6 +11,30 @@ interface AdminNavProps {
 export function AdminNav({ userEmail }: AdminNavProps) {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
+
+  // Fetch pending approvals count once on mount and refresh every 60s
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const res = await fetch("/api/admin/pending-approvals", { cache: "no-store" });
+        if (!res.ok) return;
+        const body = (await res.json()) as { count?: number };
+        if (mounted && typeof body.count === "number") {
+          setPendingCount(body.count);
+        }
+      } catch {
+        // ignore — badge will just not show
+      }
+    }
+    load();
+    const interval = setInterval(load, 60_000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -61,6 +85,17 @@ export function AdminNav({ userEmail }: AdminNavProps) {
                 className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Directory
+              </Link>
+              <Link
+                href="/admin/pending-approvals"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1.5"
+              >
+                Approvals
+                {pendingCount !== null && pendingCount > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-semibold">
+                    {pendingCount > 99 ? "99+" : pendingCount}
+                  </span>
+                )}
               </Link>
             </div>
           </div>

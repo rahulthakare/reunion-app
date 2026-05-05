@@ -18,6 +18,7 @@ All execution plans live as individual files in the `docs/` directory.
 | 4 | [docs/PLAN-004-authentication.md](docs/PLAN-004-authentication.md) | Authentication (Admin Section Only) | ✅ Complete |
 | 5 | [docs/PLAN-005-contact-address-book.md](docs/PLAN-005-contact-address-book.md) | Contact / Address Book (Search, Sort, Pagination) | ✅ Complete |
 | 6 | [docs/PLAN-006-directory-extended-fields.md](docs/PLAN-006-directory-extended-fields.md) | Directory: Extended Address Book Fields (firstName, lastName, addresses) | ✅ Complete |
+| 7 | [docs/PLAN-007-batchmate-signup-and-bulk-import.md](docs/PLAN-007-batchmate-signup-and-bulk-import.md) | Batchmate Sign-Up, Whitelist Auth & Bulk Contact Import | ✅ Complete |
 
 > Add new plans to this table as they are created. Status values: 🔲 Not Started · 🔄 In Progress · ✅ Complete · ⏸ Blocked
 
