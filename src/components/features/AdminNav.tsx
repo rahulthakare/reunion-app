@@ -28,6 +28,12 @@ export function AdminNav({ userEmail }: AdminNavProps) {
     setMobileOpen(false);
   }, [pathname]);
 
+  function isActive(href: string) {
+    // Exact match for /admin (Dashboard) so it isn't active for every /admin/* page
+    if (href === "/admin") return pathname === "/admin";
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
   // Fetch pending approvals count once on mount and refresh every 60s
   useEffect(() => {
     let mounted = true;
@@ -89,7 +95,12 @@ export function AdminNav({ userEmail }: AdminNavProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center"
+                aria-current={isActive(link.href) ? "page" : undefined}
+                className={`text-sm transition-colors flex items-center ${
+                  isActive(link.href)
+                    ? "text-indigo-600 font-semibold"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
               >
                 {link.label}
                 {link.showBadge && renderBadge()}
@@ -141,7 +152,12 @@ export function AdminNav({ userEmail }: AdminNavProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                  aria-current={isActive(link.href) ? "page" : undefined}
+                  className={`px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                    isActive(link.href)
+                      ? "bg-indigo-50 text-indigo-700 font-semibold"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
                 >
                   <span>{link.label}</span>
                   {link.showBadge && renderBadge()}

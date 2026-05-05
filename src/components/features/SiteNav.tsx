@@ -36,7 +36,11 @@ export function SiteNav() {
   }
 
   function isActive(href: string) {
-    return href === "/" ? pathname === "/" : pathname.startsWith(href.split("#")[0]) && href !== "/";
+    // Hash links (e.g. /#details) are anchor jumps within a page —
+    // never treat them as "current page" highlights.
+    if (href.includes("#")) return false;
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(href + "/");
   }
 
   function renderAuthArea() {
