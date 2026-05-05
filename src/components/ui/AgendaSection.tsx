@@ -15,7 +15,7 @@ export function AgendaSection({ items }: AgendaSectionProps) {
 
   return (
     <ol className="relative border-l-2 border-indigo-200 space-y-8 ml-4">
-      {items.map((item, i) => (
+      {items.map((item) => (
         <li key={item.id} className="ml-6">
           {/* Timeline dot */}
           <span className="absolute -left-[9px] flex items-center justify-center w-4 h-4 rounded-full bg-indigo-600 ring-4 ring-white" />
