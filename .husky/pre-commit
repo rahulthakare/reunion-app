@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+
+# ──────────────────────────────────────────────────────────────────
+# Pre-commit hook — catches issues before they reach Vercel
+#
+# Runs:
+#   1. ESLint  — same checks Vercel runs during build
+#   2. TypeScript type-check — strict type checking (catches issues
+#      that 'next dev' doesn't, like the HTMLSelectElement bug)
+#
+# To skip in an emergency: git commit --no-verify
+# But never commit code that fails these checks!
+# ──────────────────────────────────────────────────────────────────
+
+echo "🔍 Running pre-commit checks…"
+
+echo ""
+echo "  ▸ ESLint…"
+npm run lint --silent
+LINT_STATUS=$?
+
+if [ $LINT_STATUS -ne 0 ]; then
+  echo ""
+  echo "❌ ESLint failed. Fix the errors above before committing."
+  echo "   (To bypass in an emergency: git commit --no-verify)"
+  exit 1
+fi
+
+echo "    ✅ Lint passed"
+echo ""
+echo "  ▸ TypeScript type-check…"
+npm run type-check --silent
+TYPE_STATUS=$?
+
+if [ $TYPE_STATUS -ne 0 ]; then
+  echo ""
+  echo "❌ TypeScript errors. Fix the errors above before committing."
+  echo "   (To bypass in an emergency: git commit --no-verify)"
+  exit 1
+fi
+
+echo "    ✅ Type-check passed"
+echo ""
+echo "✅ All pre-commit checks passed. Committing…"
