@@ -10,8 +10,17 @@ function stringToColor(str: string): string {
   return `hsl(${hue}, 55%, 45%)`;
 }
 
+/** Returns up to 2 initials from first + last name.
+ *  Strips parentheticals and other non-letter prefixes (e.g. for
+ *  "Jha (Acharya)" it returns "J", not "(").
+ */
+function firstLetter(s: string | undefined): string {
+  if (!s) return "";
+  const match = s.match(/[A-Za-z\u0900-\u097F]/); // Latin OR Devanagari
+  return match ? match[0].toUpperCase() : "";
+}
 function getInitials(firstName: string, lastName: string): string {
-  return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase() || "?";
+  return `${firstLetter(firstName)}${firstLetter(lastName)}` || "?";
 }
 
 interface ContactCardProps {
@@ -34,7 +43,12 @@ export function ContactCard({ contact }: ContactCardProps) {
           {initials}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-gray-900 truncate">{displayName}</h3>
+          <h3 className="font-bold text-gray-900 truncate">
+            {contact.salutation && (
+              <span className="text-gray-500 font-medium mr-1">{contact.salutation}</span>
+            )}
+            {displayName}
+          </h3>
           {contact.profession && (
             <p className="text-sm text-gray-500 truncate">
               {contact.profession}
@@ -53,18 +67,11 @@ export function ContactCard({ contact }: ContactCardProps) {
           </div>
         )}
 
-        {contact.currentAddress && contact.currentAddress !== contact.city && (
-          <div className="flex items-start gap-2 text-gray-500 text-xs">
-            <span className="leading-5">🏠</span>
-            <span className="line-clamp-2">{contact.currentAddress}</span>
-          </div>
-        )}
-
         {contact.permanentAddress && (
           <div className="flex items-start gap-2 text-gray-500 text-xs">
             <span className="leading-5">🏡</span>
             <span className="line-clamp-2">
-              <span className="text-gray-400">Permanent: </span>
+              <span className="text-gray-400">Address: </span>
               {contact.permanentAddress}
             </span>
           </div>

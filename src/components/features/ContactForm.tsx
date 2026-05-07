@@ -14,10 +14,12 @@ export function ContactForm({ initial, contactId }: ContactFormProps) {
   const isEdit = Boolean(contactId);
 
   const [form, setForm] = useState({
+    salutation: initial?.salutation ?? "",
     firstName: initial?.firstName ?? "",
     lastName: initial?.lastName ?? "",
     city: initial?.city ?? "",
-    currentAddress: initial?.currentAddress ?? "",
+    // Prefer presentAddress; fall back to legacy currentAddress for backward compatibility
+    presentAddress: initial?.presentAddress ?? initial?.currentAddress ?? "",
     permanentAddress: initial?.permanentAddress ?? "",
     profession: initial?.profession ?? "",
     company: initial?.company ?? "",
@@ -79,8 +81,30 @@ export function ContactForm({ initial, contactId }: ContactFormProps) {
       {/* Name section */}
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold text-gray-700 mb-2">Name</legend>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <div className="col-span-1">
+            <label htmlFor="salutation" className="block text-sm font-medium text-gray-700 mb-1">
+              Salutation
+            </label>
+            <select
+              id="salutation"
+              name="salutation"
+              className="input-field"
+              value={form.salutation}
+              onChange={handleChange}
+            >
+              <option value="">—</option>
+              <option value="Mr.">Mr.</option>
+              <option value="Mrs.">Mrs.</option>
+              <option value="Ms.">Ms.</option>
+              <option value="Dr.">Dr.</option>
+              <option value="Prof.">Prof.</option>
+              <option value="Adv.">Adv.</option>
+              <option value="Shri.">Shri.</option>
+              <option value="Smt.">Smt.</option>
+            </select>
+          </div>
+          <div className="col-span-2 sm:col-span-2">
             <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
               First Name <span className="text-red-500">*</span>
             </label>
@@ -95,7 +119,7 @@ export function ContactForm({ initial, contactId }: ContactFormProps) {
               onChange={handleChange}
             />
           </div>
-          <div>
+          <div className="col-span-3 sm:col-span-3">
             <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
               Last Name <span className="text-red-500">*</span>
             </label>
@@ -133,29 +157,29 @@ export function ContactForm({ initial, contactId }: ContactFormProps) {
           <p className="text-xs text-gray-500 mt-1">Short label used for sorting and filtering.</p>
         </div>
         <div>
-          <label htmlFor="currentAddress" className="block text-sm font-medium text-gray-700 mb-1">
-            Current Address
+          <label htmlFor="presentAddress" className="block text-sm font-medium text-gray-700 mb-1">
+            Present Address <span className="text-gray-400 font-normal">(where they live now)</span>
           </label>
           <textarea
-            id="currentAddress"
-            name="currentAddress"
+            id="presentAddress"
+            name="presentAddress"
             rows={3}
             className="input-field resize-none"
             placeholder="Full current postal address"
-            value={form.currentAddress}
+            value={form.presentAddress}
             onChange={handleChange}
           />
         </div>
         <div>
           <label htmlFor="permanentAddress" className="block text-sm font-medium text-gray-700 mb-1">
-            Permanent Address <span className="text-gray-400 font-normal">(optional)</span>
+            Address <span className="text-gray-400 font-normal">(optional)</span>
           </label>
           <textarea
             id="permanentAddress"
             name="permanentAddress"
             rows={3}
             className="input-field resize-none"
-            placeholder="Family / permanent address"
+            placeholder="Family / native / permanent address"
             value={form.permanentAddress}
             onChange={handleChange}
           />

@@ -24,12 +24,16 @@ export function deriveContactFields(
 
   return {
     id: raw.id,
+    salutation: raw.salutation ?? "",
     firstName,
     lastName,
     name,
     city: raw.city ?? "",
-    currentAddress: raw.currentAddress ?? raw.city ?? "",
+    // Prefer the new presentAddress; fall back to legacy currentAddress
+    presentAddress: raw.presentAddress ?? raw.currentAddress ?? "",
     permanentAddress: raw.permanentAddress ?? "",
+    // Keep currentAddress populated for legacy consumers (deprecated)
+    currentAddress: raw.currentAddress ?? raw.presentAddress ?? "",
     profession: raw.profession ?? "",
     company: raw.company ?? "",
     phone: raw.phone ?? "",

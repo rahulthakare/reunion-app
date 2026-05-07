@@ -26,7 +26,9 @@ export function ContactGrid({ contacts }: ContactGridProps) {
             c.lastName,
             c.name,
             c.city,
-            c.currentAddress,
+            c.salutation,
+            c.presentAddress,
+            c.currentAddress, // legacy fallback for older records
             c.permanentAddress,
             c.profession,
             c.company,

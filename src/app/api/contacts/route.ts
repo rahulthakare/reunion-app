@@ -74,11 +74,13 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString();
 
     const contact: Omit<Contact, "id"> = {
+      salutation: body.salutation?.trim() ?? "",
       firstName,
       lastName,
       name: `${firstName} ${lastName}`.trim(),
       city: body.city.trim(),
-      currentAddress: body.currentAddress?.trim() ?? "",
+      // Prefer presentAddress; fall back to legacy currentAddress for old payloads
+      presentAddress: body.presentAddress?.trim() ?? body.currentAddress?.trim() ?? "",
       permanentAddress: body.permanentAddress?.trim() ?? "",
       profession: body.profession?.trim() ?? "",
       company: body.company?.trim() ?? "",

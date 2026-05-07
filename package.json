@@ -8,11 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "import-contacts": "tsx scripts/import-contacts.ts"
+    "import-contacts": "tsx scripts/import-contacts.ts",
+    "import-contacts-full": "tsx scripts/import-contacts-full.ts"
   },
   "dependencies": {
     "firebase": "^10.12.2",
     "firebase-admin": "^12.2.0",
+    "image-size": "^2.0.2",
     "next": "^14.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

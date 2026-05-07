@@ -56,11 +56,13 @@ export async function PUT(
     const lastName = body.lastName.trim();
 
     const updates: Partial<Omit<Contact, "id" | "createdAt">> = {
+      salutation: body.salutation?.trim() ?? "",
       firstName,
       lastName,
       name: `${firstName} ${lastName}`.trim(),
       city: body.city.trim(),
-      currentAddress: body.currentAddress?.trim() ?? "",
+      // Prefer presentAddress; fall back to legacy currentAddress
+      presentAddress: body.presentAddress?.trim() ?? body.currentAddress?.trim() ?? "",
       permanentAddress: body.permanentAddress?.trim() ?? "",
       profession: body.profession?.trim() ?? "",
       company: body.company?.trim() ?? "",
