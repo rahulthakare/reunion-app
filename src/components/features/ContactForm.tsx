@@ -32,7 +32,7 @@ export function ContactForm({ initial, contactId }: ContactFormProps) {
   const [error, setError] = useState("");
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const target = e.target;
     const { name, value, type } = target;
