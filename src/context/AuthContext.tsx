@@ -60,22 +60,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
+    // 1. Authoritative server-side check via session cookie (httpOnly, survives
+    //    mobile Safari / private browsing where Firebase IndexedDB may fail).
+    //    This runs once on mount and is the source of truth for "is the user
+    //    signed in?". Without this, mobile users can appear logged-out in the
+    //    UI even when their session cookie is valid.
+    async function loadFromServerSession() {
+      try {
+        const res = await fetch("/api/auth/session", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        if (cancelled || !res.ok) return;
+        const body = (await res.json()) as { user: AppUser | null };
+        if (!cancelled) {
+          setUser(body.user);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.warn("[AuthContext] /api/auth/session check failed:", err);
+        if (!cancelled) setLoading(false);
+      }
+    }
+    void loadFromServerSession();
+
+    // 2. Also subscribe to client-side Firebase state changes — this keeps the
+    //    UI reactive when the user signs in or signs out from a client action.
+    //    onAuthStateChanged result wins over the server check ONLY when it
+    //    actually fires (skipped silently on mobile if SDK persistence fails).
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
           const appUser = await buildAppUser(firebaseUser);
-          setUser(appUser);
+          if (!cancelled) setUser(appUser);
         } else {
-          setUser(null);
+          // Don't immediately clear `user` here — the server-side cookie may
+          // still be valid (esp. on mobile where SDK persistence is flaky).
+          // Re-check with the server before declaring the user logged out.
+          try {
+            const res = await fetch("/api/auth/session", {
+              credentials: "include",
+              cache: "no-store",
+            });
+            if (cancelled) return;
+            if (res.ok) {
+              const body = (await res.json()) as { user: AppUser | null };
+              setUser(body.user);
+            } else {
+              setUser(null);
+            }
+          } catch {
+            if (!cancelled) setUser(null);
+          }
         }
       } catch (err) {
         console.error("[AuthContext] onAuthStateChanged handler failed:", err);
-        setUser(null);
+        if (!cancelled) setUser(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     });
-    return () => unsubscribe();
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, []);
 
   async function signInWithEmail(email: string, password: string) {

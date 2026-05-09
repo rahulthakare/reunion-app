@@ -145,3 +145,37 @@ export async function DELETE() {
   });
   return response;
 }
+
+// GET /api/auth/session — return the currently signed-in user, or null.
+//
+// Used by the client-side AuthContext as a reliable source of truth, since the
+// Firebase Auth SDK's IndexedDB persistence can fail silently on mobile Safari /
+// private browsing — meaning onAuthStateChanged returns null even when the
+// httpOnly session cookie is perfectly valid.
+export async function GET(request: NextRequest) {
+  const session = request.cookies.get("session")?.value;
+  if (!session) {
+    return NextResponse.json({ user: null }, { status: 200 });
+  }
+  try {
+    const decoded = await adminAuth.verifySessionCookie(session, false);
+    let isAdmin = false;
+    try {
+      isAdmin = (await adminDb.doc(`admins/${decoded.uid}`).get()).exists;
+    } catch {
+      isAdmin = false;
+    }
+    return NextResponse.json({
+      user: {
+        uid: decoded.uid,
+        email: decoded.email ?? null,
+        displayName: (decoded.name as string | undefined) ?? null,
+        photoURL: (decoded.picture as string | undefined) ?? null,
+        isAdmin,
+      },
+    });
+  } catch {
+    // Invalid/expired cookie — treat as logged out
+    return NextResponse.json({ user: null }, { status: 200 });
+  }
+}
