@@ -13,7 +13,7 @@ async function getViewer() {
   const session = cookieStore.get("session")?.value;
   if (!session) return { authed: false, isAdmin: false };
   try {
-    const decoded = await adminAuth.verifySessionCookie(session, true);
+    const decoded = await adminAuth.verifySessionCookie(session, false);
     let isAdmin = false;
     try {
       isAdmin = (await adminDb.doc(`admins/${decoded.uid}`).get()).exists;

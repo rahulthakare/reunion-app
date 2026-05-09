@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { adminDb } from "@/lib/firebase/admin";
 import { ContactGrid } from "@/components/ui/ContactGrid";
 import { GradientHero } from "@/components/ui/GradientHero";
 import { deriveContactFields } from "@/lib/utils/contact";
@@ -32,19 +30,10 @@ async function getContacts(): Promise<ContactListItem[]> {
 }
 
 export default async function DirectoryPage() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
-
-  if (!session) {
-    redirect("/login?redirect=/directory");
-  }
-
-  try {
-    await adminAuth.verifySessionCookie(session, true);
-  } catch {
-    redirect("/login?redirect=/directory");
-  }
-
+  // Auth is enforced by middleware (PROTECTED_PREFIXES includes "/directory").
+  // No need for a redundant server-side cookie check here, which previously
+  // caused a redirect loop when verifySessionCookie's checkRevoked network
+  // call intermittently failed.
   const contacts = await getContacts();
   // City stats for the hero
   const cities = new Set(

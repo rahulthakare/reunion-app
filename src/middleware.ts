@@ -27,9 +27,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect authenticated users away from login page
+  // Redirect authenticated users away from login page.
+  // Honor ?redirect= if it's a safe in-app path; otherwise send to home.
+  // Also: refuse to bounce back to /login or to any URL that re-includes
+  // a redirect=/login chain — prevents infinite loops if a downstream page
+  // erroneously bounces back to /login.
   if (isAuthRoute && sessionCookie) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    const requested = request.nextUrl.searchParams.get("redirect");
+    const isSafe =
+      requested &&
+      requested.startsWith("/") &&
+      !requested.startsWith("//") &&
+      !requested.startsWith("/login");
+    const target = isSafe ? requested! : "/";
+    return NextResponse.redirect(new URL(target, request.url));
   }
 
   return NextResponse.next();

@@ -25,7 +25,11 @@ async function getAdminUser(): Promise<AdminUser | null> {
   let uid: string;
   let email: string;
   try {
-    const decoded = await adminAuth.verifySessionCookie(session, true);
+    // checkRevoked=false: revocation requires an extra network call to Google
+    // that intermittently times out and caused redirect loops on Vercel cold
+    // starts. The middleware already gates the route, and admin actions are
+    // re-verified server-side in API routes — so a stale cookie here is safe.
+    const decoded = await adminAuth.verifySessionCookie(session, false);
     uid = decoded.uid;
     email = decoded.email ?? "";
   } catch {
