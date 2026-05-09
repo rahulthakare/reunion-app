@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/#details", label: "Event" },
-  { href: "/directory", label: "Address Book", authRequired: true },
-  { href: "/#rsvp", label: "RSVP" },
+  { href: "/", label: "Home", icon: "🏠" },
+  { href: "/#details", label: "Event", icon: "🗓️" },
+  { href: "/gallery", label: "Gallery", icon: "🖼️" },
+  { href: "/articles", label: "Articles", icon: "📰" },
+  { href: "/directory", label: "Address Book", icon: "📒", authRequired: true },
+  { href: "/fun-zone", label: "Fun Zone", icon: "🎉", authRequired: true, accent: true },
+  { href: "/#rsvp", label: "RSVP", icon: "✅" },
 ];
 
 export function SiteNav() {
@@ -20,7 +23,6 @@ export function SiteNav() {
 
   useEffect(() => setMounted(true), []);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
@@ -36,8 +38,6 @@ export function SiteNav() {
   }
 
   function isActive(href: string) {
-    // Hash links (e.g. /#details) are anchor jumps within a page —
-    // never treat them as "current page" highlights.
     if (href.includes("#")) return false;
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(href + "/");
@@ -53,14 +53,14 @@ export function SiteNav() {
           {user.isAdmin && (
             <Link
               href="/admin"
-              className="text-xs text-gray-500 hover:text-indigo-600"
+              className="text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold transition-colors"
             >
-              Admin
+              ⚡ Admin
             </Link>
           )}
           <button
             onClick={handleLogout}
-            className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
+            className="text-xs bg-white/70 hover:bg-white text-gray-700 border border-gray-200 px-3 py-1.5 rounded-full transition-colors"
           >
             Sign out
           </button>
@@ -70,7 +70,7 @@ export function SiteNav() {
     return (
       <Link
         href="/login"
-        className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
+        className="text-xs bg-gradient-to-r from-brand-500 to-accent-500 text-white px-3 py-1.5 rounded-full font-semibold shadow-glow hover:shadow-pop hover:-translate-y-0.5 transition-all"
       >
         Sign in
       </Link>
@@ -78,37 +78,51 @@ export function SiteNav() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-20">
+    <nav className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-brand-100/70 sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-        <Link href="/" className="font-bold text-indigo-700 text-base">
-          NEHS <span className="text-gray-900">Batch &apos;93</span>
+        <Link
+          href="/"
+          className="font-display font-bold text-base sm:text-lg tracking-tight flex items-center gap-1.5"
+        >
+          <span className="inline-block animate-wiggle origin-bottom">🎓</span>
+          <span className="text-gradient">NEHS</span>
+          <span className="text-gray-900">Batch &apos;93</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-4 sm:gap-6">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm transition-colors ${
-                isActive(link.href)
-                  ? "text-indigo-700 font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {link.label}
-              {mounted && link.authRequired && !user && !loading && (
-                <span className="ml-1 text-xs text-gray-400">🔒</span>
-              )}
-            </Link>
-          ))}
+        <div className="hidden md:flex items-center gap-1.5 lg:gap-2">
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`group text-sm px-3 py-1.5 rounded-full transition-all flex items-center gap-1 ${
+                  active
+                    ? link.accent
+                      ? "bg-gradient-to-r from-accent-500 to-brand-500 text-white shadow-glow"
+                      : "bg-brand-100 text-brand-800 font-semibold"
+                    : link.accent
+                    ? "text-accent-700 hover:bg-accent-50 font-medium"
+                    : "text-gray-600 hover:text-brand-700 hover:bg-brand-50"
+                }`}
+              >
+                <span className="text-xs">{link.icon}</span>
+                <span>{link.label}</span>
+                {mounted && link.authRequired && !user && !loading && (
+                  <span className="text-xs opacity-50">🔒</span>
+                )}
+              </Link>
+            );
+          })}
+          <span className="mx-2 h-5 w-px bg-gray-200" />
           {renderAuthArea()}
         </div>
 
         {/* Mobile hamburger */}
         <button
           type="button"
-          className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+          className="md:hidden inline-flex items-center justify-center p-2 rounded-full text-brand-700 hover:bg-brand-100 transition-colors"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle menu"
           aria-expanded={mobileOpen}
@@ -127,24 +141,30 @@ export function SiteNav() {
 
       {/* Mobile menu panel */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white">
+        <div className="md:hidden border-t border-brand-100/70 bg-white/95 backdrop-blur">
           <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-2.5 rounded-lg text-sm flex items-center justify-between transition-colors ${
-                  isActive(link.href)
-                    ? "bg-indigo-50 text-indigo-700 font-semibold"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <span>{link.label}</span>
-                {mounted && link.authRequired && !user && !loading && (
-                  <span className="text-xs text-gray-400">🔒</span>
-                )}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-3 py-2.5 rounded-xl text-sm flex items-center justify-between transition-colors ${
+                    active
+                      ? "bg-brand-100 text-brand-800 font-semibold"
+                      : "text-gray-700 hover:bg-brand-50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>{link.icon}</span>
+                    <span>{link.label}</span>
+                  </span>
+                  {mounted && link.authRequired && !user && !loading && (
+                    <span className="text-xs opacity-50">🔒</span>
+                  )}
+                </Link>
+              );
+            })}
             <div className="mt-2 pt-3 border-t border-gray-100 flex items-center justify-between">
               {renderAuthArea()}
             </div>

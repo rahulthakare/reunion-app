@@ -13,6 +13,8 @@ const NAV_LINKS = [
   { href: "/admin/agenda", label: "Agenda" },
   { href: "/admin/attendees", label: "Attendees" },
   { href: "/admin/directory", label: "Directory" },
+  { href: "/admin/gallery", label: "Gallery" },
+  { href: "/admin/articles", label: "Articles" },
   { href: "/admin/pending-approvals", label: "Approvals", showBadge: true },
 ];
 

@@ -5,21 +5,20 @@ import { discoverMemoryImages } from "@/lib/utils/heroImages";
 import { Countdown } from "@/components/ui/Countdown";
 import { RSVPForm } from "@/components/ui/RSVPForm";
 import { AgendaSection } from "@/components/ui/AgendaSection";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { adminDb } from "@/lib/firebase/admin";
 import type { Agenda, AgendaItem } from "@/types/agenda";
 
-// Force dynamic so we read the latest agenda from Firestore on each request.
 export const dynamic = "force-dynamic";
 
-// Call Firestore directly via Admin SDK — no HTTP self-call needed.
 async function getAgenda(): Promise<Agenda> {
   try {
     const doc = await adminDb.doc("config/agenda").get();
     if (!doc.exists) return { items: [] };
     const data = doc.data() as Agenda | undefined;
-    const items = (data?.items ?? []).slice().sort(
-      (a: AgendaItem, b: AgendaItem) => (a.order ?? 0) - (b.order ?? 0)
-    );
+    const items = (data?.items ?? [])
+      .slice()
+      .sort((a: AgendaItem, b: AgendaItem) => (a.order ?? 0) - (b.order ?? 0));
     return { items, updatedAt: data?.updatedAt };
   } catch (err) {
     console.error("[home] Failed to fetch agenda from Firestore:", err);
@@ -27,23 +26,47 @@ async function getAgenda(): Promise<Agenda> {
   }
 }
 
+const INFO_CARDS = [
+  {
+    icon: "📅",
+    title: "Date",
+    primary: "Saturday, 13 June 2026",
+    secondary: "Save the date in your calendar",
+    color: "from-brand-100 to-amber-50",
+    iconBg: "bg-brand-100 text-brand-700",
+  },
+  {
+    icon: "📍",
+    title: "Venue",
+    primary: "New English High School",
+    secondary: "Wardha, Maharashtra",
+    color: "from-accent-100 to-pink-50",
+    iconBg: "bg-accent-100 text-accent-700",
+  },
+  {
+    icon: "🎓",
+    title: "Batch",
+    primary: "Class of 1993",
+    secondary: "30+ Year Reunion",
+    color: "from-sky2-100 to-indigo-50",
+    iconBg: "bg-sky2-100 text-sky2-600",
+  },
+];
+
 export default async function Home() {
   const [agenda, memoryImages] = await Promise.all([
     getAgenda(),
     Promise.resolve(discoverMemoryImages()),
   ]);
 
-  // Smrutigandh is the singular hero image — used both as the centerpiece
-  // spotlight and as the ambient blurred background.
   const heroImage = "/images/hero_smrutigandh.jpg";
 
   return (
-    <main className="min-h-screen bg-white">
-
+    <main>
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative bg-indigo-950 text-white pb-20 overflow-hidden">
-        {/* Layer 1: Blurred background image (subtle ambient texture) */}
-        <div className="absolute inset-0 opacity-20">
+      <section className="relative bg-indigo-950 text-white pb-24 sm:pb-28 overflow-hidden">
+        {/* Layer 1: blurred ambient texture */}
+        <div className="absolute inset-0 opacity-25">
           <Image
             src={heroImage}
             alt=""
@@ -53,22 +76,23 @@ export default async function Home() {
             className="object-cover blur-2xl scale-110"
           />
         </div>
+        {/* Layer 2: indigo + warm gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/90 via-indigo-900/85 to-indigo-950" />
+        {/* Layer 2.5: warm glow at the top from brand orange */}
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-brand-500/15 blur-3xl pointer-events-none" />
+        <div className="absolute top-32 right-10 w-72 h-72 rounded-full bg-accent-500/15 blur-3xl pointer-events-none" />
 
-        {/* Layer 2: Indigo gradient overlay (keeps text readable) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/85 via-indigo-900/80 to-indigo-950" />
-
-        {/* Layer 3: Hero content (sits above the image + gradient) */}
+        {/* Layer 3: Hero content */}
         <div className="relative max-w-5xl mx-auto px-6 pt-16 sm:pt-20 text-center">
-          <p className="text-indigo-300 text-sm font-semibold uppercase tracking-widest mb-4">
-            You are invited
+          <p className="text-amber-300 text-xs font-semibold uppercase tracking-[0.3em] mb-5">
+            ✨ You are invited ✨
           </p>
 
-          {/* Layer 4: The featured image — sharp, centered, glowing */}
           <div className="flex justify-center mb-8">
-            <div className="relative">
-              {/* Soft glow halo behind the image */}
-              <div className="absolute -inset-4 bg-amber-300/30 blur-2xl rounded-full pointer-events-none" />
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-4 ring-white/10 bg-white/5 backdrop-blur-sm">
+            <div className="relative animate-fade-in-up">
+              {/* Soft glow halo */}
+              <div className="absolute -inset-6 bg-gradient-to-br from-amber-300/40 via-brand-400/30 to-accent-400/30 blur-3xl rounded-full pointer-events-none animate-pulse" />
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-4 ring-white/15 bg-white/5 backdrop-blur-sm">
                 <Image
                   src={heroImage}
                   alt="Smrutigandh — NEHS Wardha Batch '93 Reunion"
@@ -81,21 +105,27 @@ export default async function Home() {
             </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">
-            New English High School
+          <h1 className="heading-display text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-3 animate-fade-in-up">
+            New English <br className="sm:hidden" />
+            <span className="bg-gradient-to-r from-amber-300 via-brand-300 to-accent-300 bg-clip-text text-transparent">
+              High School
+            </span>
           </h1>
-          <p className="text-xl sm:text-3xl font-semibold text-indigo-200 mb-4">
+          <p className="text-xl sm:text-3xl font-semibold text-indigo-100 mb-2 heading-display">
             Wardha — Batch of 1993
           </p>
-          <p className="text-indigo-200 text-base sm:text-lg mt-4 mb-6 max-w-2xl mx-auto">
+          <p className="text-indigo-100/90 text-base sm:text-lg mt-4 mb-7 max-w-2xl mx-auto leading-relaxed">
             Over 30 years later, it&apos;s time to reconnect, reminisce, and celebrate
             the friendships that shaped who we are.
           </p>
-          <p className="inline-block text-amber-200 font-semibold text-base sm:text-lg mb-10 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm ring-1 ring-white/10">
-            📅 Saturday, 13 June 2026 &nbsp;·&nbsp; 📍 NEHS, Wardha
+          <p className="inline-flex items-center gap-2 text-amber-200 font-semibold text-sm sm:text-base mb-10 px-4 py-2 rounded-full bg-white/10 backdrop-blur ring-1 ring-amber-300/30 shadow-lg">
+            <span>📅</span>
+            <span>Saturday, 13 June 2026</span>
+            <span className="opacity-50">·</span>
+            <span>📍</span>
+            <span>NEHS, Wardha</span>
           </p>
 
-          {/* Countdown */}
           <div className="mb-10">
             <Countdown />
           </div>
@@ -103,133 +133,181 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <a
               href="#rsvp"
-              className="w-full sm:w-auto bg-white text-indigo-700 font-bold px-8 py-3 rounded-lg hover:bg-indigo-50 transition-colors shadow-lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-amber-300 to-brand-400 text-indigo-950 font-bold px-8 py-3 rounded-full hover:shadow-glow hover:-translate-y-0.5 transition-all shadow-lg"
             >
-              RSVP Now
+              ✅ RSVP Now
             </a>
             <Link
               href="/directory"
-              className="w-full sm:w-auto border border-white/60 text-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition-colors"
+              className="w-full sm:w-auto border border-white/40 text-white font-semibold px-8 py-3 rounded-full hover:bg-white/10 transition-colors backdrop-blur"
             >
               📒 Address Book
+            </Link>
+            <Link
+              href="/gallery"
+              className="w-full sm:w-auto text-indigo-200 hover:text-white font-medium px-3 py-3 transition-colors"
+            >
+              🖼️ Gallery →
             </Link>
           </div>
           <a
             href="#details"
-            className="inline-block mt-4 text-indigo-200 hover:text-white text-sm underline transition-colors"
+            className="inline-block mt-5 text-indigo-200 hover:text-amber-200 text-sm transition-colors animate-bounce"
           >
-            View event details ↓
+            ↓ View event details
           </a>
         </div>
 
-        {/* Decorative bottom wave */}
+        {/* Decorative bottom curve */}
         <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none">
-          <svg viewBox="0 0 1200 60" preserveAspectRatio="none" className="w-full h-12 fill-white">
-            <path d="M0,60 C300,0 900,60 1200,0 L1200,60 Z" />
+          <svg
+            viewBox="0 0 1200 80"
+            preserveAspectRatio="none"
+            className="w-full h-12 sm:h-16"
+          >
+            <path
+              d="M0,80 C300,0 900,80 1200,10 L1200,80 Z"
+              fill="rgb(255 250 243)"
+            />
           </svg>
         </div>
       </section>
 
       {/* ── Key info cards ───────────────────────────────────── */}
-      <section id="details" className="max-w-5xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Event Details</h2>
-          <p className="text-gray-500">Everything you need to plan your trip back to Wardha.</p>
-        </div>
+      <section id="details" className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
+        <SectionHeading
+          eyebrow="The essentials"
+          title="Event Details"
+          subtitle="Everything you need to plan your trip back to Wardha."
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="card text-center">
-            <div className="text-4xl mb-3">📅</div>
-            <h3 className="font-bold text-gray-900 mb-1">Date</h3>
-            <p className="text-indigo-600 font-semibold">Saturday, 13 June 2026</p>
-          </div>
-          <div className="card text-center">
-            <div className="text-4xl mb-3">📍</div>
-            <h3 className="font-bold text-gray-900 mb-1">Venue</h3>
-            <p className="text-indigo-600 font-semibold">New English High School</p>
-            <p className="text-gray-500 text-sm">Wardha, Maharashtra</p>
-          </div>
-          <div className="card text-center">
-            <div className="text-4xl mb-3">🎓</div>
-            <h3 className="font-bold text-gray-900 mb-1">Batch</h3>
-            <p className="text-indigo-600 font-semibold">Class of 1993</p>
-            <p className="text-gray-500 text-sm">30+ Year Reunion</p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {INFO_CARDS.map((c, i) => (
+            <div
+              key={c.title}
+              className={`relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br ${c.color} border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all animate-fade-in-up`}
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <div
+                className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl text-2xl ${c.iconBg} mb-4 shadow-sm`}
+              >
+                {c.icon}
+              </div>
+              <h3 className="font-bold text-gray-900 heading-display text-lg mb-1">
+                {c.title}
+              </h3>
+              <p className="text-gray-900 font-semibold">{c.primary}</p>
+              <p className="text-gray-600 text-sm mt-0.5">{c.secondary}</p>
+              {/* corner accent dot */}
+              <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-white/70" />
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ── Agenda ───────────────────────────────────────────── */}
-      <section id="agenda" className="bg-gray-50 py-16">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Day&apos;s Schedule</h2>
-            <p className="text-gray-500">Here&apos;s what we have planned for the day.</p>
-          </div>
+      <section
+        id="agenda"
+        className="relative py-16 sm:py-20 bg-gradient-to-br from-amber-50 via-white to-accent-50/40 overflow-hidden"
+      >
+        {/* Soft decorative blobs */}
+        <div className="absolute -top-20 -left-10 w-72 h-72 rounded-full bg-brand-200/40 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -right-10 w-72 h-72 rounded-full bg-accent-200/30 blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-3xl mx-auto px-6">
+          <SectionHeading
+            eyebrow="Your day"
+            title="Day's Schedule"
+            subtitle="Here's what we have planned — bring your appetite for memories."
+          />
           <AgendaSection items={agenda.items} />
         </div>
       </section>
 
       {/* ── About ───────────────────────────────────────────── */}
-      <section className="py-16">
+      <section className="relative py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            30+ Years of Memories 🎉
-          </h2>
-          <p className="text-gray-600 text-lg leading-relaxed mb-4">
-            It has been more than three decades since we walked the corridors of
-            <strong> New English High School, Wardha</strong> together. So much has changed —
-            and yet the bonds we formed as classmates remain timeless.
-          </p>
-          <p className="text-gray-600 text-lg leading-relaxed">
-            This reunion is a chance to catch up with old friends, share stories of the
-            years gone by, relive memories of our school days, and create new ones that
-            will last another 30 years.
-          </p>
+          <SectionHeading
+            eyebrow="Three decades on"
+            title={
+              <>
+                30+ Years of <span className="text-gradient">Memories</span> 🎉
+              </>
+            }
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
+            <div className="card-pop bg-gradient-to-br from-brand-50 to-white">
+              <div className="text-2xl mb-2">🏫</div>
+              <p className="text-gray-700 leading-relaxed">
+                It has been more than three decades since we walked the corridors of{" "}
+                <strong>New English High School, Wardha</strong> together. So much has
+                changed — and yet the bonds we formed as classmates remain timeless.
+              </p>
+            </div>
+            <div className="card-pop bg-gradient-to-br from-accent-50 to-white">
+              <div className="text-2xl mb-2">🤝</div>
+              <p className="text-gray-700 leading-relaxed">
+                This reunion is a chance to catch up with old friends, share stories of
+                the years gone by, relive memories of our school days, and create new
+                ones that will last another 30 years.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── RSVP ────────────────────────────────────────────── */}
-      <section id="rsvp" className="bg-indigo-50 py-16">
-        <div className="max-w-xl mx-auto px-6">
+      <section
+        id="rsvp"
+        className="relative py-16 sm:py-20 bg-gradient-to-br from-indigo-50 via-accent-50/50 to-amber-50 overflow-hidden"
+      >
+        {/* Decorative hand-drawn vibes */}
+        <div className="absolute top-10 left-10 text-7xl opacity-10 select-none">🎈</div>
+        <div className="absolute bottom-10 right-10 text-7xl opacity-10 select-none">🎉</div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-accent-300/15 blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-xl mx-auto px-6">
+          <SectionHeading
+            eyebrow="See you there"
+            title="Will you join us?"
+            subtitle="A quick RSVP helps us plan food, seating, and surprises."
+          />
           <RSVPForm />
         </div>
       </section>
 
       {/* ── Address Book CTA ────────────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="card text-center bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
-            <div className="text-5xl mb-4">📒</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Reconnect with Batchmates
-            </h2>
-            <p className="text-gray-600 mb-6 max-w-xl mx-auto">
-              Browse the full address book of NEHS Wardha — Batch &apos;93. See who&apos;s where,
-              what they&apos;re doing, and how to reach out.
-            </p>
-            <Link
-              href="/directory"
-              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
-            >
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50 via-white to-brand-50 border border-indigo-100 shadow-sm p-8 sm:p-12 text-center">
+            <div className="absolute top-4 left-4 text-5xl opacity-15 select-none">📞</div>
+            <div className="absolute bottom-4 right-4 text-5xl opacity-15 select-none">💌</div>
+            <div className="text-5xl mb-3 inline-block animate-float-med">📒</div>
+            <SectionHeading
+              eyebrow="Stay connected"
+              title="Reconnect with Batchmates"
+              subtitle="Browse the full address book of NEHS Wardha — Batch '93. See who's where, what they're doing, and how to reach out."
+              decorate={false}
+            />
+            <Link href="/directory" className="btn-primary">
               Open Address Book →
             </Link>
-            <p className="text-xs text-gray-400 mt-3">Sign-in required for privacy</p>
+            <p className="text-xs text-gray-400 mt-3">🔒 Sign-in required for privacy</p>
           </div>
         </div>
       </section>
 
       {/* ── Memories Gallery ────────────────────────────────── */}
-      <section className="py-16 bg-gradient-to-b from-indigo-50 to-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-              A Glimpse of Our Memories
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
-              Moments that shaped our years at NEHS Wardha.
-              Tap any image to view it in full.
-            </p>
-          </div>
+      <section className="relative py-16 sm:py-20 bg-gradient-to-b from-white via-amber-50/40 to-white overflow-hidden">
+        <div className="absolute -top-10 right-10 text-6xl opacity-10 select-none rotate-12">📸</div>
+        <div className="absolute bottom-10 left-10 text-6xl opacity-10 select-none -rotate-12">🎞️</div>
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+          <SectionHeading
+            eyebrow="Scrapbook"
+            title={<>A glimpse of our <span className="text-gradient">memories</span></>}
+            subtitle="Moments that shaped our years at NEHS Wardha. Tap any image to view it in full."
+          />
 
           {memoryImages.length > 0 ? (
             <MemoryGallery images={memoryImages} />
@@ -239,27 +317,54 @@ export default async function Home() {
             </div>
           )}
 
-          <p className="text-center text-gray-500 text-sm mt-10">
-            Have photos to share? Bring them on{" "}
-            <span className="font-semibold text-indigo-600">13 June 2026</span> —
-            we&apos;ll add them to the collection.
-          </p>
+          <div className="text-center mt-10">
+            <p className="text-gray-500 text-sm">
+              Have photos to share? Bring them on{" "}
+              <span className="font-semibold text-brand-700">13 June 2026</span> — we&apos;ll
+              add them to the collection.
+            </p>
+            <Link
+              href="/gallery"
+              className="inline-block mt-4 btn-secondary text-sm"
+            >
+              🖼️ Browse the full gallery →
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* ── Footer ──────────────────────────────────────────── */}
-      <footer className="border-t border-gray-100 py-8">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="font-bold text-gray-900">NEHS Wardha — Batch &apos;93</p>
-            <p className="text-gray-400 text-sm">New English High School Reunion · 13 June 2026</p>
+      <footer className="relative bg-gradient-to-br from-indigo-950 to-indigo-900 text-indigo-100 py-10 mt-0">
+        <div className="absolute inset-0 confetti-bg opacity-20" />
+        <div className="relative max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <p className="font-bold heading-display text-white text-lg">
+              🎓 NEHS Wardha — Batch &apos;93
+            </p>
+            <p className="text-indigo-300 text-sm mt-0.5">
+              New English High School Reunion · 13 June 2026
+            </p>
           </div>
-          <Link
-            href="/login"
-            className="text-sm text-gray-400 hover:text-indigo-600 transition-colors"
-          >
-            Admin →
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/articles"
+              className="text-sm text-indigo-200 hover:text-amber-300 transition-colors"
+            >
+              Articles
+            </Link>
+            <Link
+              href="/gallery"
+              className="text-sm text-indigo-200 hover:text-amber-300 transition-colors"
+            >
+              Gallery
+            </Link>
+            <Link
+              href="/login"
+              className="text-sm text-indigo-300 hover:text-amber-300 transition-colors"
+            >
+              Admin →
+            </Link>
+          </div>
         </div>
       </footer>
     </main>

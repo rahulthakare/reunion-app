@@ -82,20 +82,33 @@ export function ContactGrid({ contacts }: ContactGridProps) {
 
   return (
     <div>
-      {/* Search + Sort bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      {/* Search + Sort bar — sits inside a soft frosted card so it doesn't
+          look like floating form controls on the page background. */}
+      <div className="bg-white/80 backdrop-blur rounded-2xl border border-gray-100 shadow-sm p-3 sm:p-4 mb-6 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+            🔍
+          </span>
           <input
             type="text"
-            className="input-field pl-9"
+            className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition"
             placeholder="Search by name, city, address, profession…"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => handleSearch("")}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-600 px-1.5 py-0.5 rounded"
+            >
+              ✕
+            </button>
+          )}
         </div>
         <select
-          className="input-field sm:w-56"
+          className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition sm:w-56"
           value={sort}
           onChange={(e) => handleSort(e.target.value as SortKey)}
         >
@@ -106,21 +119,30 @@ export function ContactGrid({ contacts }: ContactGridProps) {
         </select>
       </div>
 
-      {/* Results count */}
-      <p className="text-sm text-gray-500 mb-4">
-        {filtered.length === 0
-          ? "No batchmates found."
-          : `Showing ${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(
-              currentPage * PAGE_SIZE,
-              filtered.length
-            )} of ${filtered.length} batchmates`}
-      </p>
+      {/* Results count + active search chip */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <p className="text-sm text-gray-500">
+          {filtered.length === 0
+            ? "No batchmates found."
+            : `Showing ${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(
+                currentPage * PAGE_SIZE,
+                filtered.length
+              )} of ${filtered.length} batchmate${filtered.length === 1 ? "" : "s"}`}
+        </p>
+        {search && (
+          <span className="pill-brand">
+            🔎 “{search}”
+          </span>
+        )}
+      </div>
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">🔍</p>
-          <p>No batchmates match your search.</p>
+        <div className="text-center py-16 bg-gradient-to-br from-amber-50 to-accent-50/40 rounded-3xl border border-amber-100">
+          <p className="text-5xl mb-3 inline-block animate-float-med">🔍</p>
+          <p className="text-gray-700 font-semibold heading-display">
+            No batchmates match your search.
+          </p>
           <button
             onClick={() => handleSearch("")}
             className="btn-secondary mt-4 text-sm"
@@ -138,11 +160,14 @@ export function ContactGrid({ contacts }: ContactGridProps) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
+        <nav
+          aria-label="Pagination"
+          className="flex items-center justify-center gap-1.5 mt-10 flex-wrap"
+        >
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="btn-secondary disabled:opacity-40 px-3 py-1.5 text-sm"
+            className="px-3 py-1.5 text-sm rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-brand-50 hover:border-brand-200 disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-gray-200 transition-colors"
           >
             ← Prev
           </button>
@@ -151,10 +176,10 @@ export function ContactGrid({ contacts }: ContactGridProps) {
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all min-w-[36px] ${
                 p === currentPage
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-gradient-to-r from-brand-500 to-accent-500 text-white shadow-glow"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-brand-50 hover:border-brand-200"
               }`}
             >
               {p}
@@ -164,11 +189,11 @@ export function ContactGrid({ contacts }: ContactGridProps) {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="btn-secondary disabled:opacity-40 px-3 py-1.5 text-sm"
+            className="px-3 py-1.5 text-sm rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-brand-50 hover:border-brand-200 disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-gray-200 transition-colors"
           >
             Next →
           </button>
-        </div>
+        </nav>
       )}
     </div>
   );

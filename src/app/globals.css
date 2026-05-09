@@ -3,34 +3,101 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
+  --background: #fffaf3;
+  --foreground: #1f2937;
+  --primary: #ea580c;
+  --primary-hover: #c2410c;
+  --accent: #db2777;
   --danger: #dc2626;
 }
 
-/* Dark-mode auto-switching disabled until we ship a full dark theme.
-   The app is light-mode only for now to avoid contrast issues with cards & inputs. */
+/* Light-mode only for now — keeps contrast crisp on cards & inputs. */
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(254, 215, 170, 0.55) 0%, transparent 35%),
+    radial-gradient(circle at 100% 0%, rgba(252, 207, 232, 0.45) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(199, 210, 254, 0.35) 0%, transparent 45%),
+    var(--background);
+  background-attachment: fixed;
+  font-family: var(--font-inter), system-ui, sans-serif;
   color-scheme: light;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center gap-1.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white px-4 py-2 rounded-full shadow-glow hover:shadow-pop hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 font-semibold;
   }
   .btn-secondary {
-    @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors;
+    @apply inline-flex items-center gap-1.5 bg-white/80 backdrop-blur text-brand-700 border border-brand-200 px-4 py-2 rounded-full hover:bg-brand-50 hover:border-brand-300 transition-all font-medium;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 text-brand-700 hover:text-brand-900 hover:bg-brand-50 px-3 py-1.5 rounded-full transition-colors;
   }
   .input-field {
-    @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+    @apply w-full border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition;
   }
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+    @apply bg-white/90 backdrop-blur rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow;
+  }
+  .card-pop {
+    @apply bg-white rounded-2xl border border-gray-100 p-6 shadow-md hover:shadow-pop hover:-translate-y-0.5 transition-all duration-200;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+  .pill-brand {
+    @apply pill bg-brand-100 text-brand-800;
+  }
+  .pill-accent {
+    @apply pill bg-accent-100 text-accent-700;
+  }
+  .pill-sky {
+    @apply pill bg-sky2-100 text-sky2-600;
+  }
+  .pill-green {
+    @apply pill bg-emerald-100 text-emerald-700;
+  }
+  .pill-amber {
+    @apply pill bg-amber-100 text-amber-800;
+  }
+
+  /* Section heading with handwritten feel */
+  .heading-display {
+    @apply font-display tracking-tight;
+  }
+
+  /* Animated gradient text for hero titles */
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-600 via-accent-500 to-sky2-500 bg-clip-text text-transparent;
+    background-size: 200% 100%;
+    animation: gradient-pan 12s ease infinite;
+  }
+}
+
+/* Confetti dots used as decorative background */
+.confetti-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(249, 115, 22, 0.25) 2px, transparent 2.5px),
+    radial-gradient(circle, rgba(236, 72, 153, 0.22) 2px, transparent 2.5px),
+    radial-gradient(circle, rgba(34, 211, 238, 0.22) 2px, transparent 2.5px);
+  background-size: 60px 60px, 90px 90px, 120px 120px;
+  background-position: 0 0, 30px 45px, 75px 15px;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

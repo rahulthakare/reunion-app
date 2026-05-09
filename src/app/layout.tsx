@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Source_Code_Pro } from "next/font/google";
+import { Inter, Fraunces, Source_Code_Pro } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+// Playful display serif used for hero/section headings
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["SOFT", "WONK"],
 });
 
 const sourceCodePro = Source_Code_Pro({
@@ -27,7 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${sourceCodePro.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${fraunces.variable} ${sourceCodePro.variable} antialiased`}
+      >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
