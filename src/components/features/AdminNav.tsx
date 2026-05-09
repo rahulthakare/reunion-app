@@ -112,6 +112,14 @@ export function AdminNav({ userEmail }: AdminNavProps) {
 
           {/* Desktop user info + logout */}
           <div className="hidden md:flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-sm px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-semibold transition-colors flex items-center gap-1"
+              title="Back to the public site"
+            >
+              <span>🏠</span>
+              <span>View Site</span>
+            </Link>
             <span className="text-sm text-gray-500 hidden lg:block">{userEmail}</span>
             <button
               onClick={handleLogout}
@@ -166,8 +174,18 @@ export function AdminNav({ userEmail }: AdminNavProps) {
                 </Link>
               ))}
             </div>
-            <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="px-3 text-xs text-gray-500 truncate mb-2">
+            <div className="mt-3 pt-3 border-t border-gray-200 flex flex-col gap-2">
+              <Link
+                href="/"
+                className="px-3 py-2.5 rounded-lg text-sm bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-semibold transition-colors flex items-center justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <span>🏠</span>
+                  <span>View Site</span>
+                </span>
+                <span aria-hidden="true">→</span>
+              </Link>
+              <div className="px-3 text-xs text-gray-500 truncate">
                 Signed in as {userEmail}
               </div>
               <button
