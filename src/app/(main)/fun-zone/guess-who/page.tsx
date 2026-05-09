@@ -35,7 +35,9 @@ export default async function GuessWhoPage() {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🕵️ Guess Who?</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            🕵️ Pahechan Kaun? <span className="text-base text-gray-500 font-medium">(Guess Who?)</span>
+          </h1>
           <p className="text-gray-600 mt-1">
             Upload an old photo of yourself anonymously. Others guess in the comments.
             When you reveal, correct guesses are auto-graded and points are awarded!

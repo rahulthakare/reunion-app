@@ -28,7 +28,7 @@ export default async function LeaderboardPage() {
                 <th className="text-left py-2 px-2">Rank</th>
                 <th className="text-left py-2 px-2">Batchmate</th>
                 <th className="text-right py-2 px-2">Total</th>
-                <th className="text-right py-2 px-2 hidden sm:table-cell">Guess Who</th>
+                <th className="text-right py-2 px-2 hidden sm:table-cell">Pahechan</th>
                 <th className="text-right py-2 px-2 hidden sm:table-cell">Captions</th>
                 <th className="text-right py-2 px-2 hidden sm:table-cell">Quiz</th>
                 <th className="text-right py-2 px-2 hidden md:table-cell">Correct guesses</th>

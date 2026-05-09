@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "/fun-zone", label: "🏠 Home", exact: true },
-  { href: "/fun-zone/guess-who", label: "🕵️ Guess Who?" },
+  { href: "/fun-zone/guess-who", label: "🕵️ Pahechan Kaun?" },
   { href: "/fun-zone/caption-this", label: "📝 Caption This!" },
   { href: "/fun-zone/memory-quiz", label: "💭 Memory Quiz" },
-  { href: "/fun-zone/then-and-now", label: "🎬 Then & Now" },
+  { href: "/fun-zone/then-and-now", label: "🎬 Tevha Ani Atta?" },
   { href: "/fun-zone/leaderboard", label: "🏆 Leaderboard" },
 ];
 

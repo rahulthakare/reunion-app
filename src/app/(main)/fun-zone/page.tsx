@@ -8,7 +8,7 @@ const GAMES = [
   {
     href: "/fun-zone/guess-who",
     icon: "🕵️",
-    title: "Guess Who?",
+    title: "Pahechan Kaun? 🕵️",
     description: "Upload an old photo of yourself anonymously and let everyone guess.",
     color: "from-pink-200 via-pink-100 to-amber-100",
     glow: "shadow-[0_10px_30px_-10px_rgba(236,72,153,0.4)]",
@@ -32,7 +32,7 @@ const GAMES = [
   {
     href: "/fun-zone/then-and-now",
     icon: "🎬",
-    title: "Then & Now",
+    title: "Tevha Ani Atta? 🎬",
     description: "Compare a school-era photo with a recent one. Vote for the biggest glow-up!",
     color: "from-indigo-200 via-violet-100 to-pink-100",
     glow: "shadow-[0_10px_30px_-10px_rgba(99,102,241,0.4)]",

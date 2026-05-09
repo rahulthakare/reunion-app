@@ -35,7 +35,9 @@ export default async function ThenAndNowPage() {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🎬 Then &amp; Now</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            🎬 Tevha Ani Atta? <span className="text-base text-gray-500 font-medium">(Then &amp; Now)</span>
+          </h1>
           <p className="text-gray-600 mt-1">
             Two photos — school days vs. today. Vote for the biggest glow-up!
           </p>

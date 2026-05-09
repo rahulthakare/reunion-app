@@ -56,7 +56,7 @@ export function ThenAndNowUploader({ userId }: { userId: string }) {
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="btn-primary">
-        🎬 Share my Then & Now
+        🎬 Share my Tevha Ani Atta?
       </button>
     );
   }
@@ -64,7 +64,7 @@ export function ThenAndNowUploader({ userId }: { userId: string }) {
   return (
     <form onSubmit={submit} className="card space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">Then &amp; Now</h3>
+        <h3 className="font-semibold text-gray-900">Tevha Ani Atta?</h3>
         <button type="button" onClick={() => setOpen(false)} className="text-sm text-gray-500">
           Cancel
         </button>
