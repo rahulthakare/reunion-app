@@ -17,8 +17,7 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase/client";
+import { auth } from "@/lib/firebase/client";
 import type { AppUser } from "@/types/user";
 
 interface AuthContextValue {
@@ -34,17 +33,24 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function buildAppUser(firebaseUser: User): Promise<AppUser> {
-  // Try to check Firestore for admin role — but don't fail login if Firestore is
-  // unreachable or rules deny client reads. The server-side admin layout does the
-  // authoritative admin check via Firebase Admin SDK (which bypasses rules).
+  // For admin status, ask the server (which uses the Admin SDK and bypasses
+  // Firestore Security Rules). Client-side reads of `admins` are typically
+  // denied by rules and would always return isAdmin=false, incorrectly
+  // overwriting the correct value from the server-side session check.
   let isAdmin = false;
   try {
-    const adminDoc = await getDoc(doc(db, "admins", firebaseUser.uid));
-    isAdmin = adminDoc.exists();
+    const res = await fetch("/api/auth/session", {
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const body = (await res.json()) as { user: AppUser | null };
+      if (body.user?.uid === firebaseUser.uid) {
+        isAdmin = !!body.user.isAdmin;
+      }
+    }
   } catch (err) {
-    // Likely Firestore Security Rules denying client reads — that's expected.
-    // Server-side check will handle authoritative role verification.
-    console.warn("[AuthContext] Could not read admins doc client-side (this is expected if Firestore rules deny reads):", err);
+    console.warn("[AuthContext] Could not refresh isAdmin from server:", err);
   }
   return {
     uid: firebaseUser.uid,

@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/#details", label: "Event", icon: "🗓️" },
   { href: "/gallery", label: "Gallery", icon: "🖼️" },
   { href: "/articles", label: "Articles", icon: "📰" },
+  { href: "/committees", label: "Committees", icon: "👥" },
   { href: "/directory", label: "Address Book", icon: "📒", authRequired: true },
   { href: "/fun-zone", label: "Fun Zone", icon: "🎉", authRequired: true, accent: true },
   { href: "/#rsvp", label: "RSVP", icon: "✅" },

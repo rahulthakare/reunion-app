@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: "/admin/directory", label: "Directory" },
   { href: "/admin/gallery", label: "Gallery" },
   { href: "/admin/articles", label: "Articles" },
+  { href: "/admin/committees", label: "Committees" },
   { href: "/admin/pending-approvals", label: "Approvals", showBadge: true },
 ];
 

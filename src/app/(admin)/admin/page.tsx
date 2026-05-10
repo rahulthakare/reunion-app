@@ -83,6 +83,13 @@ export default function AdminDashboardPage() {
               <p className="text-sm text-gray-500 mt-0.5">Review and publish submissions</p>
             </div>
           </a>
+          <a href="/admin/committees" className="card flex items-start gap-4 hover:border-indigo-200 transition-colors">
+            <div className="text-2xl">👥</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Committees</h3>
+              <p className="text-sm text-gray-500 mt-0.5">Organize volunteers into teams</p>
+            </div>
+          </a>
         </div>
       </div>
 
