@@ -69,7 +69,22 @@ export default async function ArticlesIndexPage() {
         </div>
       </GradientHero>
 
-      <div className="mt-10">
+      {/* Notice: articles will be posted after the reunion */}
+      <div className="mt-8 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 px-5 sm:px-6 py-4 sm:py-5 shadow-sm flex items-start gap-4">
+        <div className="text-3xl shrink-0" aria-hidden="true">📅</div>
+        <div className="text-sm sm:text-base">
+          <p className="font-semibold text-amber-900">
+            Articles will be posted after the reunion program 🌸
+          </p>
+          <p className="text-amber-800/90 mt-1">
+            Memories, essays and reflections from <em>Smrutigandh</em> will appear
+            here once the reunion is complete. Thanks for your patience — the best
+            stories are still being lived!
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8">
         {articles.length === 0 ? (
           <ArticleList articles={[]} emptyText="No articles published yet — check back soon!" />
         ) : sections.length === 1 ? (

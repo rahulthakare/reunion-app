@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset="0.55" stop-color="#f97316"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <radialGradient id="petal" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff7ed"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Rounded squircle background (Apple touch style) -->
+  <rect x="0" y="0" width="180" height="180" rx="40" ry="40" fill="url(#bg)"/>
+
+  <!-- Subtle highlight -->
+  <ellipse cx="56" cy="40" rx="62" ry="28" fill="#ffffff" opacity="0.18"/>
+
+  <!-- Smrutigandh flower at the top (5-petal hibiscus-style) -->
+  <g transform="translate(90 40)">
+    <ellipse cx="0" cy="-15" rx="9" ry="14" fill="url(#petal)"/>
+    <ellipse cx="14.25" cy="-4.5" rx="9" ry="14" fill="url(#petal)" transform="rotate(72 14.25 -4.5)"/>
+    <ellipse cx="8.85" cy="12" rx="9" ry="14" fill="url(#petal)" transform="rotate(144 8.85 12)"/>
+    <ellipse cx="-8.85" cy="12" rx="9" ry="14" fill="url(#petal)" transform="rotate(216 -8.85 12)"/>
+    <ellipse cx="-14.25" cy="-4.5" rx="9" ry="14" fill="url(#petal)" transform="rotate(288 -14.25 -4.5)"/>
+    <!-- Flower center -->
+    <circle r="6" fill="#f59e0b"/>
+    <!-- Stamen dots -->
+    <circle cx="0" cy="-2" r="1.2" fill="#fde68a"/>
+    <circle cx="2" cy="1" r="1.2" fill="#fde68a"/>
+    <circle cx="-2" cy="1" r="1.2" fill="#fde68a"/>
+  </g>
+
+  <!-- Two friends arm-in-arm -->
+  <g fill="#1e293b">
+    <!-- LEFT friend -->
+    <circle cx="60" cy="98" r="14"/>
+    <path d="M36 160 C36 132 44 118 60 118 C72 118 78 124 84 134 L84 160 Z"/>
+
+    <!-- RIGHT friend -->
+    <circle cx="120" cy="98" r="14"/>
+    <path d="M144 160 C144 132 136 118 120 118 C108 118 102 124 96 134 L96 160 Z"/>
+
+    <!-- Arms overlapping -->
+    <path d="M84 134 L96 134 L96 142 L84 142 Z"/>
+  </g>
+
+  <!-- Heart between heads -->
+  <path d="M90 86 C86 81 78 81 78 88 C78 93 90 102 90 102 C90 102 102 93 102 88 C102 81 94 81 90 86 Z" fill="#fda4af" opacity="0.95"/>
+
+  <!-- Year label at bottom -->
+  <text x="90" y="174" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" opacity="0.9" letter-spacing="2">SMRUTIGANDH '93</text>
+</svg>
